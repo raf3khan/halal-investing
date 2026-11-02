@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Halal Screen</title>
+<meta name="description" content="Check a Tadawul or US stock against the AAOIFI Shariah screening ratios, with every check explained.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a ledger. Figures on the left like a working sheet, the verdict and four ruled checks on the right. */
+:root{
+  --bg:#f3f4f6; --surface:#ffffff; --ink:#151a23; --muted:#5b6475; --rule:#dde1e8;
+  --accent:#2b3a8c; --accent-soft:#e7eaf7;
+  --pass:#17734a; --pass-soft:#e3f3ea; --fail:#b42318; --fail-soft:#fbe7e5; --warn:#9a5b00; --warn-soft:#fbf0dc;
+  --f-display:"Newsreader",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1218; --surface:#171b23; --ink:#e8ebf1; --muted:#9aa3b5; --rule:#2a303c;
+  --accent:#9fb0ff; --accent-soft:#1f2645;
+  --pass:#5fd39a; --pass-soft:#12291f; --fail:#ff8a7d; --fail-soft:#331716; --warn:#f2b45a; --warn-soft:#2f2412; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1218; --surface:#171b23; --ink:#e8ebf1; --muted:#9aa3b5; --rule:#2a303c;
+  --accent:#9fb0ff; --accent-soft:#1f2645;
+  --pass:#5fd39a; --pass-soft:#12291f; --fail:#ff8a7d; --fail-soft:#331716; --warn:#f2b45a; --warn-soft:#2f2412; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1120px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;margin-bottom:22px}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(28px,4vw,38px);line-height:1.1;margin:0;letter-spacing:-.01em}
+h1 span{color:var(--accent)}
+.lede{color:var(--muted);margin:6px 0 0;max-width:60ch}
+.std{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:18px}
+.panel h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 12px;font-weight:600}
+.examples{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.chip{font:inherit;font-size:13px;border:1px solid var(--rule);background:transparent;color:var(--ink);padding:5px 10px;border-radius:999px;cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.note{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+.field{display:grid;gap:4px;margin-top:12px}
+.field label{font-size:13px;font-weight:500}
+.field .hint{font-size:12px;color:var(--muted)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input,select{font:inherit;font-size:14px;width:100%;padding:8px 10px;border:1px solid var(--rule);border-radius:7px;background:var(--bg);color:var(--ink)}
+input[type=number]{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.unit{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+fieldset{border:0;padding:0;margin:16px 0 0;border-top:1px solid var(--rule);padding-top:4px}
+legend{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:10px 0 0}
+details.live{margin-top:16px;border-top:1px solid var(--rule);padding-top:12px}
+details.live summary{cursor:pointer;font-weight:500;font-size:14px}
+.btn{font:inherit;font-weight:500;font-size:14px;padding:8px 14px;border-radius:7px;border:1px solid var(--accent);background:var(--accent);color:var(--surface);cursor:pointer}
+.live-row{display:flex;gap:8px;margin-top:10px}
+.live-row input{flex:1;min-width:0}
+.msg{font-size:12.5px;margin-top:8px;color:var(--muted)}
+.msg.err{color:var(--fail)}
+
+/* verdict */
+.verdict{display:grid;gap:4px;padding:20px 22px;border-radius:10px;border:1px solid var(--rule);background:var(--surface);margin-bottom:14px}
+.verdict .co{font-size:13px;color:var(--muted)}
+.verdict .big{font-family:var(--f-display);font-size:clamp(30px,4.5vw,44px);font-weight:600;line-height:1.05;letter-spacing:-.01em}
+.verdict.pass{background:var(--pass-soft);border-color:color-mix(in srgb,var(--pass) 35%,transparent)} .verdict.pass .big{color:var(--pass)}
+.verdict.fail{background:var(--fail-soft);border-color:color-mix(in srgb,var(--fail) 35%,transparent)} .verdict.fail .big{color:var(--fail)}
+.verdict.warn{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 35%,transparent)} .verdict.warn .big{color:var(--warn)}
+.verdict .sum{margin:4px 0 0;max-width:62ch}
+.checks{background:var(--surface);border:1px solid var(--rule);border-radius:10px}
+.check{padding:16px 20px;display:grid;gap:8px}
+.check+.check{border-top:1px solid var(--rule)}
+.check-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.check h3{margin:0;font-size:15.5px;font-weight:600}
+.pill{font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.pill.pass{background:var(--pass-soft);color:var(--pass)} .pill.fail{background:var(--fail-soft);color:var(--fail)} .pill.warn{background:var(--warn-soft);color:var(--warn)}
+.figure{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted)}
+.figure b{color:var(--ink);font-weight:500;font-size:15px}
+.meter{position:relative;height:10px;border-radius:5px;background:var(--bg);border:1px solid var(--rule);overflow:visible}
+.meter .fill{position:absolute;left:0;top:0;bottom:0;border-radius:5px;max-width:100%}
+.meter .fill.pass{background:var(--pass)} .meter .fill.fail{background:var(--fail)} .meter .fill.warn{background:var(--warn)}
+.meter .lim{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--ink)}
+.scale{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.why{margin:0;font-size:14px;max-width:68ch}
+.formula{font-family:var(--f-mono);font-size:12.5px;color:var(--muted);overflow-x:auto;white-space:nowrap}
+.purify{margin-top:14px}
+.purify .out{font-family:var(--f-display);font-size:28px;font-weight:600;margin-top:8px}
+.foot{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch;display:grid;gap:6px}
+.foot p{margin:0}
+.badge-ex{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--warn);background:var(--warn-soft);padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle}
+@media (prefers-reduced-motion:no-preference){.meter .fill{transition:width .35s ease}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Halal <span>Screen</span></h1>
+      <p class="lede">Check whether a Tadawul or US stock passes the AAOIFI Shariah screens. Each check shows the number, the limit and why the rule exists.</p>
+    </div>
+    <div class="std">AAOIFI Shariah Standard No. 21</div>
+  </header>
+
+  <div class="grid">
+    <form class="panel" id="form" autocomplete="off" novalidate>
+      <h2>Company figures</h2>
+      <div class="examples" role="group" aria-label="Load an example">
+        <button type="button" class="chip" data-ex="0">Software, passes</button>
+        <button type="button" class="chip" data-ex="1">Petrochemicals, high debt</button>
+        <button type="button" class="chip" data-ex="2">Retailer, interest income</button>
+        <button type="button" class="chip" data-ex="3">Conventional bank</button>
+      </div>
+      <p class="note">Examples are made-up companies with round numbers, so you can see each outcome. Enter real figures from the latest annual report to screen an actual stock.</p>
+
+      <div class="field">
+        <label for="name">Company</label>
+        <input id="name" type="text" placeholder="e.g. Saudi Aramco (2222)">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="market">Market</label>
+          <select id="market"><option value="SAR">Tadawul (SAR)</option><option value="USD">US (USD)</option></select>
+        </div>
+        <div class="field">
+          <label for="mcap">Market cap <span class="unit">M</span></label>
+          <input id="mcap" type="number" min="0" step="any" inputmode="decimal">
+        </div>
+      </div>
+      <div class="field">
+        <label for="biz">Main business</label>
+        <select id="biz">
+          <option value="ok">Permissible (tech, industry, retail…)</option>
+          <option value="review">Mixed or unclear, needs a closer look</option>
+          <option value="defense">Weapons and defense</option>
+          <option value="finance">Conventional banking, insurance or lending</option>
+          <option value="alcohol">Alcohol</option>
+          <option value="pork">Pork products</option>
+          <option value="gambling">Gambling or casinos</option>
+          <option value="adult">Adult entertainment</option>
+          <option value="tobacco">Tobacco</option>
+        </select>
+      </div>
+
+      <fieldset>
+        <legend>Balance sheet</legend>
+        <div class="field">
+          <label for="debt">Interest-bearing debt <span class="unit">M</span></label>
+          <input id="debt" type="number" min="0" step="any" inputmode="decimal">
+          <span class="hint">Conventional loans, bonds and overdrafts. Sukuk and Islamic financing are excluded by many scholars, but AAOIFI's text counts all interest-bearing borrowing.</span>
+        </div>
+        <div class="field">
+          <label for="cash">Interest-bearing cash and investments <span class="unit">M</span></label>
+          <input id="cash" type="number" min="0" step="any" inputmode="decimal">
+          <span class="hint">Deposits in conventional banks plus short-term interest-bearing securities. If the report does not split them, use cash plus short-term investments.</span>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Income statement</legend>
+        <div class="row2">
+          <div class="field">
+            <label for="rev">Total revenue <span class="unit">M</span></label>
+            <input id="rev" type="number" min="0" step="any" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="bad">Non-permissible income <span class="unit">M</span></label>
+            <input id="bad" type="number" min="0" step="any" inputmode="decimal">
+          </div>
+        </div>
+        <span class="hint note">Interest income plus revenue from any prohibited activity. Look for "finance income" or "interest income" in the notes.</span>
+        <div class="field">
+          <label for="shares">Shares outstanding <span class="unit">M</span></label>
+          <input id="shares" type="number" min="0" step="any" inputmode="decimal">
+          <span class="hint">Used only for the purification amount.</span>
+        </div>
+      </fieldset>
+
+      <details class="live" id="live">
+        <summary>Fill from a US ticker</summary>
+        <p class="note">Pulls the latest annual figures from Financial Modeling Prep. Their free key covers US stocks, 250 lookups a day. Your key stays in this browser.</p>
+        <div class="field">
+          <label for="apikey">FMP API key</label>
+          <input id="apikey" type="password" placeholder="Paste your free key">
+        </div>
+        <div class="live-row">
+          <input id="ticker" type="text" placeholder="Ticker, e.g. MSFT" aria-label="Ticker">
+          <button type="button" class="btn" id="fetch">Look up</button>
+        </div>
+        <div class="msg" id="livemsg" role="status"></div>
+      </details>
+    </form>
+
+    <section aria-live="polite">
+      <div class="verdict" id="verdict">
+        <div class="co" id="vco"></div>
+        <div class="big" id="vbig"></div>
+        <p class="sum" id="vsum"></p>
+      </div>
+      <div class="checks" id="checks"></div>
+
+      <div class="panel purify">
+        <h2>Purification</h2>
+        <p class="why">Even a passing stock earns a little non-permissible income. Scholars ask you to give your share of it to charity. Enter how many shares you hold.</p>
+        <div class="row2">
+          <div class="field">
+            <label for="held">Shares you hold</label>
+            <input id="held" type="number" min="0" step="any" inputmode="decimal" value="100">
+          </div>
+          <div class="field">
+            <label>Per share, per year</label>
+            <div class="figure" id="pershare" style="padding-top:8px">–</div>
+          </div>
+        </div>
+        <div class="out" id="purify">–</div>
+        <p class="note" id="purifynote"></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="foot">
+    <p><strong>Method.</strong> AAOIFI Shariah Standard No. 21 (Financial Papers) sets three ratio limits: interest-bearing debt under 30% of market value, interest-bearing deposits and securities under 30% of market value, and non-permissible income under 5% of total revenue. The company's main business must also be permissible. Other screening bodies use total assets instead of market cap or a 33% limit, so results can differ from other apps.</p>
+    <p><strong>This is an educational tool, not a fatwa.</strong> Figures come from what you enter or from the data provider and may be out of date. Ask a qualified scholar before you invest.</p>
+  </div>
+</div>
+
+<script>
+const EXAMPLES = [
+  {name:"Example: Najd Cloud Software", market:"SAR", mcap:12000, biz:"ok", debt:600, cash:1400, rev:2500, bad:30, shares:100},
+  {name:"Example: Gulf Polymer Industries", market:"SAR", mcap:20000, biz:"ok", debt:8200, cash:2100, rev:15000, bad:180, shares:400},
+  {name:"Example: Harbor Street Stores", market:"USD", mcap:5000, biz:"ok", debt:900, cash:1100, rev:3000, bad:210, shares:250},
+  {name:"Example: Riyadh Commercial Bank", market:"SAR", mcap:60000, biz:"finance", debt:30000, cash:45000, rev:9000, bad:7200, shares:3000},
+];
+const BIZ = {
+  ok:{s:"pass", t:"Main business is permissible.", d:"The company's core activity is not on the prohibited list, so it moves on to the financial ratios."},
+  review:{s:"warn", t:"Main business needs a closer look.", d:"The company has a mix of activities. Check its segment reporting to make sure prohibited lines are small and not its core business."},
+  defense:{s:"warn", t:"Weapons and defense: scholars differ.", d:"Some scholars allow defense companies that sell to governments for national defense, while others exclude them. Most halal indexes exclude them."},
+  finance:{s:"fail", t:"Conventional finance is not permissible.", d:"Its core income is interest (riba) from lending or conventional insurance. A company whose main business is prohibited fails regardless of its ratios."},
+  alcohol:{s:"fail", t:"Alcohol is a prohibited business.", d:"Producing or selling alcohol as a core business rules the stock out regardless of its ratios."},
+  pork:{s:"fail", t:"Pork products are a prohibited business.", d:"Producing or selling pork as a core business rules the stock out regardless of its ratios."},
+  gambling:{s:"fail", t:"Gambling is a prohibited business.", d:"Casinos and betting (maysir) are prohibited, so the stock fails regardless of its ratios."},
+  adult:{s:"fail", t:"Adult entertainment is a prohibited business.", d:"This core activity rules the stock out regardless of its ratios."},
+  tobacco:{s:"fail", t:"Tobacco is excluded.", d:"Most contemporary Shariah boards and halal indexes exclude tobacco as harmful, so the stock fails this screen."},
+};
+const $ = id => document.getElementById(id);
+const ids = ["name","market","mcap","biz","debt","cash","rev","bad","shares"];
+const num = id => { const v = parseFloat($(id).value); return isFinite(v) ? v : null; };
+const pct = x => (x*100).toFixed(1) + "%";
+const money = (x, cur) => cur + " " + (Math.abs(x) >= 1000 ? (x/1000).toLocaleString(undefined,{maximumFractionDigits:2}) + "B" : x.toLocaleString(undefined,{maximumFractionDigits:1}) + "M");
+
+function ratioCheck(title, numer, denom, limit, cur, numLabel, denLabel, why, failWhy){
+  if (numer == null || denom == null || denom <= 0) return {title, s:"warn", missing:true, why:"Enter " + numLabel.toLowerCase() + " and " + denLabel.toLowerCase() + " to run this check."};
+  const r = numer/denom, s = r < limit ? "pass" : "fail";
+  return {title, s, r, limit,
+    fig: `<b>${pct(r)}</b> of ${denLabel.toLowerCase()} · limit under ${pct(limit).replace(".0","")}`,
+    formula: `${numLabel} ${money(numer,cur)} ÷ ${denLabel} ${money(denom,cur)} = ${pct(r)}`,
+    why: (s==="pass" ? why : failWhy)};
+}
+
+function render(){
+  const cur = $("market").value, name = $("name").value.trim() || "Unnamed company";
+  const mcap=num("mcap"), debt=num("debt"), cash=num("cash"), rev=num("rev"), bad=num("bad"), shares=num("shares");
+  const b = BIZ[$("biz").value];
+  const checks = [
+    {title:"Business activity", s:b.s, fig:`<b style="font-family:var(--f-body)">${b.t}</b>`, why:b.d},
+    ratioCheck("Debt", debt, mcap, .30, cur, "Interest-bearing debt", "Market cap",
+      "The company relies mostly on its own equity. AAOIFI tolerates some conventional borrowing because few companies can avoid it, but caps it at 30% of market value.",
+      "Too much of the company is funded by interest-bearing loans. Above 30% of market value, AAOIFI treats the riba as too large a part of the business to overlook."),
+    ratioCheck("Interest-bearing cash and securities", cash, mcap, .30, cur, "Interest-bearing cash", "Market cap",
+      "The company keeps a modest amount in interest-earning deposits and securities, under the 30% cap.",
+      "The company parks too much money in interest-earning deposits or bonds. Above 30% of market value, owning the share starts to look like owning an interest-bearing account."),
+    ratioCheck("Non-permissible income", bad, rev, .05, cur, "Non-permissible income", "Revenue",
+      "Under 5% of revenue comes from interest or prohibited activity. That small share is tolerated, and you purify it below.",
+      "More than 5% of revenue comes from interest or prohibited activity. At that level the haram income is too large to clean through purification."),
+  ];
+  const fails = checks.filter(c=>c.s==="fail"), warns = checks.filter(c=>c.s==="warn");
+  const v = $("verdict");
+  v.className = "verdict " + (fails.length ? "fail" : warns.length ? "warn" : "pass");
+  $("vco").textContent = name + " · " + (cur==="SAR" ? "Tadawul" : "US market");
+  $("vbig").textContent = fails.length ? "Not Shariah compliant" : warns.length ? "Needs review" : "Shariah compliant";
+  $("vsum").textContent = fails.length
+    ? `Fails ${fails.length} of 4 checks: ${fails.map(c=>c.title.toLowerCase()).join(", ")}.`
+    : warns.length ? `No check fails, but ${warns.map(c=>c.title.toLowerCase()).join(", ")} ${warns.length>1?"need":"needs"} a closer look before you decide.`
+    : "Passes all four AAOIFI checks. Remember to purify the small non-permissible share of dividends or gains.";
+
+  $("checks").innerHTML = checks.map(c => {
+    const label = c.s==="pass" ? "Pass" : c.s==="fail" ? "Fail" : (c.missing ? "Missing" : "Review");
+    let meter = "";
+    if (c.r != null){
+      const max = c.limit === .05 ? .10 : .60;
+      const w = Math.min(c.r/max,1)*100, l = c.limit/max*100;
+      meter = `<div><div class="meter" role="img" aria-label="${pct(c.r)} against a limit of ${pct(c.limit)}"><div class="fill ${c.s}" style="width:${w}%"></div><div class="lim" style="left:calc(${l}% - 1px)"></div></div>
+      <div class="scale"><span>0%</span><span>limit ${pct(c.limit).replace(".0","")}</span><span>${pct(max).replace(".0","")}+</span></div></div>`;
+    }
+    return `<div class="check"><div class="check-head"><h3>${c.title}</h3><span class="pill ${c.s}">${label}</span></div>
+      ${c.fig ? `<div class="figure">${c.fig}</div>` : ""}${meter}
+      <p class="why">${c.why}</p>${c.formula ? `<div class="formula">${c.formula}</div>` : ""}</div>`;
+  }).join("");
+
+  const held = num("held");
+  if (bad != null && shares > 0){
+    const per = bad/shares; // M / M = currency per share
+    $("pershare").textContent = cur + " " + per.toFixed(4);
+    $("purify").textContent = held != null ? cur + " " + (per*held).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) : "–";
+    $("purifynote").textContent = "Your share of the year's non-permissible income: " + money(bad,cur) + " ÷ " + shares.toLocaleString() + "M shares × your holding. Give it to charity, not as zakat.";
+  } else { $("pershare").textContent = "–"; $("purify").textContent = "–"; $("purifynote").textContent = "Enter non-permissible income and shares outstanding to calculate."; }
+}
+
+function load(i){
+  const e = EXAMPLES[i];
+  ids.forEach(k => $(k).value = e[k]);
+  document.querySelectorAll("[data-ex]").forEach(b => b.setAttribute("aria-pressed", b.dataset.ex == i));
+  render();
+}
+document.querySelectorAll("[data-ex]").forEach(b => b.addEventListener("click", () => load(+b.dataset.ex)));
+$("form").addEventListener("input", e => {
+  if (e.target.id !== "apikey" && e.target.id !== "ticker") document.querySelectorAll("[data-ex]").forEach(b => b.setAttribute("aria-pressed","false"));
+  render();
+});
+$("form").addEventListener("submit", e => e.preventDefault());
+$("held").addEventListener("input", render);
+
+// Live lookup (US, Financial Modeling Prep)
+try { const k = localStorage.getItem("fmpKey"); if (k) $("apikey").value = k; } catch(_){}
+function classify(sector, industry){
+  const s = (sector||"").toLowerCase(), i = (industry||"").toLowerCase();
+  if (/bank|insurance|credit services|mortgage|capital markets|asset management|financial data/.test(i) || (s.includes("financial") && !/conglomerate|shell/.test(i))) return "finance";
+  if (/winer|distill|brewer/.test(i)) return "alcohol";
+  if (/tobacco/.test(i)) return "tobacco";
+  if (/gambling|casino/.test(i)) return "gambling";
+  if (/aerospace|defense/.test(i)) return "defense";
+  if (/entertainment|restaurants|lodging|conglomerate|packaged foods|meat|reit/.test(i)) return "review";
+  return "ok";
+}
+$("fetch").addEventListener("click", async () => {
+  const key = $("apikey").value.trim(), t = $("ticker").value.trim().toUpperCase(), msg = $("livemsg");
+  msg.className = "msg";
+  if (!key || !t){ msg.textContent = "Add your API key and a ticker first."; return; }
+  try { localStorage.setItem("fmpKey", key); } catch(_){}
+  msg.textContent = "Looking up " + t + "…";
+  const base = "https://financialmodelingprep.com/stable/";
+  try {
+    const get = async p => { const r = await fetch(base + p + (p.includes("?")?"&":"?") + "apikey=" + encodeURIComponent(key)); if (!r.ok) throw new Error(r.status); return r.json(); };
+    const [prof, bs, inc] = await Promise.all([get("profile?symbol="+t), get("balance-sheet-statement?symbol="+t+"&limit=1"), get("income-statement?symbol="+t+"&limit=1")]);
+    const p = prof[0], b = bs[0], n = inc[0];
+    if (!p || !b || !n) throw new Error("nodata");
+    const M = x => x == null ? "" : +(x/1e6).toFixed(1);
+    $("name").value = p.companyName + " (" + t + ")";
+    $("market").value = "USD";
+    $("mcap").value = M(p.marketCap);
+    $("biz").value = classify(p.sector, p.industry);
+    $("debt").value = M(b.totalDebt);
+    $("cash").value = M((b.cashAndCashEquivalents||0) + (b.shortTermInvestments||0));
+    $("rev").value = M(n.revenue);
+    $("bad").value = M(Math.max(n.interestIncome||0,0));
+    $("shares").value = p.price ? M(p.marketCap/p.price) : "";
+    document.querySelectorAll("[data-ex]").forEach(x => x.setAttribute("aria-pressed","false"));
+    msg.textContent = `Filled from the ${n.fiscalYear || n.date} annual report. Industry: ${p.industry || "unknown"}. Total debt includes leases, so the debt ratio is on the strict side. Check the business type yourself.`;
+    render();
+  } catch(err){
+    msg.className = "msg err";
+    msg.textContent = err.message === "nodata" ? "No figures found for " + t + ". The free key only covers US-listed stocks." : "Couldn't reach the data provider (" + err.message + "). Check your key and try again.";
+  }
+});
+
+load(0);
+</script>
+</body>
+</html>
